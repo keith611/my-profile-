@@ -146,12 +146,13 @@ export function ProfilePage() {
             <nav className="social-links" aria-label="Contact and social links">
               {socialLinks.map((item) => (
                 <a key={item.label} href={item.url} target="_blank" rel="noreferrer" aria-label={item.label} title={item.label}>
-                  <span aria-hidden="true">{{ GitHub: 'GH', LinkedIn: 'in', Instagram: '◎' }[item.label]}</span>
+                  <span className="social-mark" aria-hidden="true">{{ GitHub: 'GH', LinkedIn: 'in', Instagram: '◎' }[item.label]}</span>
+                  <small>{item.label}</small>
                 </a>
               ))}
-              {profile.email && <a href={`mailto:${profile.email}`} aria-label="Email" title="Email"><span aria-hidden="true">@</span></a>}
-              {phones[0] && <a href={`tel:${phones[0]}`} aria-label={`Call ${phones[0]}`} title="Call"><span aria-hidden="true">⌕</span></a>}
-              {whatsappUrl && <a href={whatsappUrl} target="_blank" rel="noreferrer" aria-label="WhatsApp" title="WhatsApp"><span aria-hidden="true">WA</span></a>}
+              {profile.email && <a href={`mailto:${profile.email}`} aria-label="Email" title="Email"><span className="social-mark" aria-hidden="true">@</span><small>Email</small></a>}
+              {phones[0] && <a href={`tel:${phones[0]}`} aria-label={`Call ${phones[0]}`} title="Call"><span className="social-mark" aria-hidden="true">☎</span><small>Call</small></a>}
+              {whatsappUrl && <a href={whatsappUrl} target="_blank" rel="noreferrer" aria-label="WhatsApp" title="WhatsApp"><span className="social-mark social-mark-whatsapp" aria-hidden="true">WA</span><small>WhatsApp</small></a>}
             </nav>
             <div className="direct-contact">
               {profile.email && <button type="button" onClick={() => copyDetail(profile.email, 'Email address')}>Copy email</button>}
