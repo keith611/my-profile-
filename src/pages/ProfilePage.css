@@ -177,3 +177,73 @@
   .profile-actions .profile-button:last-child:nth-child(3) { grid-column: 1 / -1; }
 }
 @media (prefers-reduced-motion: reduce) { .profile-card, .profile-avatar-wrap, .profile-card-cover, .cover-orbit, .profile-button, .profile-links a { animation: none; transition: none; } }
+
+/* Dark Vexa profile palette */
+.profile-shell {
+  color: #f4f2f7;
+  background:
+    radial-gradient(ellipse at 8% 18%, rgba(34, 192, 166, .24), transparent 34%),
+    radial-gradient(ellipse at 92% 22%, rgba(255, 112, 107, .2), transparent 32%),
+    radial-gradient(ellipse at 55% 100%, rgba(121, 96, 229, .22), transparent 40%),
+    #10131b;
+}
+
+.profile-grain {
+  opacity: .1;
+  background-image: radial-gradient(#d6d5e3 .45px, transparent .55px);
+}
+
+.profile-brand { color: #f5f3fa; }
+.profile-brand-mark { box-shadow: 0 0 24px rgba(88, 192, 174, .24); }
+.profile-topbar-note { color: #a9adbb; }
+
+.profile-card {
+  background: #1b1e29;
+  border-color: rgba(255, 255, 255, .1);
+  box-shadow: 0 30px 100px rgba(0, 0, 0, .42), 0 0 55px rgba(71, 101, 188, .12);
+}
+
+.profile-card-cover {
+  background: linear-gradient(118deg, #075c59 0%, #2863a1 35%, #5941a8 66%, #b84f61 100%);
+  background-size: 240% 240%;
+}
+
+.profile-avatar-wrap { background: #1b1e29; }
+.profile-avatar { border-color: rgba(255, 255, 255, .16); }
+.profile-online-dot { border-color: #1b1e29; }
+.profile-content h1 { color: #f6f3fb; }
+.profile-role { color: #a8ddd2; }
+.profile-location { color: #a7adbd; }
+.profile-bio { color: #c2c5d0; }
+
+.profile-button-primary {
+  border-color: #29a993;
+  background: linear-gradient(110deg, #087e75, #386eb5);
+  box-shadow: 0 6px 20px rgba(14, 153, 133, .24);
+}
+.profile-button-primary:hover { background: linear-gradient(110deg, #0b9a89, #7056d4); }
+.profile-button-secondary {
+  border-color: #9179e8;
+  color: #ded6ff;
+  background: rgba(112, 86, 212, .17);
+}
+.profile-button-outline {
+  border-color: rgba(255, 143, 123, .5);
+  color: #ffc2ad;
+  background: rgba(203, 91, 80, .12);
+}
+
+.profile-links a {
+  border-color: rgba(255, 255, 255, .08);
+  color: #f0eef7;
+}
+.profile-links a:nth-child(1) { background: rgba(28, 158, 132, .16); }
+.profile-links a:nth-child(2) { background: rgba(117, 91, 211, .19); }
+.profile-links a:hover { border-color: rgba(130, 212, 199, .52); filter: brightness(1.18); }
+.profile-links a span:last-child { color: #ff9a80; }
+
+.profile-bottom-rule { color: #9da2b2; }
+.profile-bottom-rule span:first-child,
+.profile-bottom-rule span:last-child { background: linear-gradient(90deg, #31b49c, #8b72dd, #f08a73); }
+.profile-footer { color: #a7adbd; }
+.footer-dot { color: #ff9077; }
