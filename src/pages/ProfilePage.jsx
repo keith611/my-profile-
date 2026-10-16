@@ -7,7 +7,7 @@ function initials(name) {
   return (name || ' ').trim().split(/\s+/).slice(0, 2).map((part) => part[0] || '').join('').toUpperCase();
 }
 
-function contactFile(onStatus) {
+async function contactFile(onStatus) {
   const escapeVCard = (value = '') => value.replace(/\\/g, '\\\\').replace(/\n/g, '\\n').replace(/,/g, '\\,').replace(/;/g, '\\;');
   const lines = [
     'BEGIN:VCARD', 'VERSION:3.0', `FN:${escapeVCard(profile.name)}`,
@@ -16,22 +16,33 @@ function contactFile(onStatus) {
     profile.email ? `EMAIL:${profile.email}` : '',
     'END:VCARD',
   ].filter(Boolean);
-  const file = new Blob([lines.join('\r\n')], { type: 'text/vcard;charset=utf-8' });
-  const fileUrl = URL.createObjectURL(file);
+  const vCard = new Blob([lines.join('\r\n')], { type: 'text/vcard;charset=utf-8' });
+  const fileName = `${(profile.name || 'contact').trim().replace(/\s+/g, '-')}.vcf`;
   const link = document.createElement('a');
-  link.href = fileUrl;
   const isPhone = navigator.userAgentData?.mobile || /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
   if (isPhone) {
-    onStatus('Opening your contact card. Follow your phone’s prompt to add it to Contacts.');
-    window.location.assign(fileUrl);
-    window.setTimeout(() => URL.revokeObjectURL(fileUrl), 60_000);
-    return;
+    const contact = new File([vCard], fileName, { type: 'text/vcard' });
+    if (navigator.canShare?.({ files: [contact] }) && navigator.share) {
+      try {
+        await navigator.share({ files: [contact], title: `Save ${profile.name} to Contacts` });
+        onStatus('Choose Contacts or your phone’s save-contact option to finish.');
+        return;
+      } catch (error) {
+        if (error.name === 'AbortError') {
+          onStatus('Contact sharing cancelled. Tap Save Contact to try again.');
+          return;
+        }
+      }
+    }
+    onStatus('Your browser cannot open the contact share menu. Opening the contact file instead.');
   }
 
+  const fileUrl = URL.createObjectURL(vCard);
+  link.href = fileUrl;
   link.download = `${(profile.name || 'contact').trim().replace(/\s+/g, '-')}.vcf`;
   link.click();
   window.setTimeout(() => URL.revokeObjectURL(fileUrl), 1000);
-  onStatus('Contact card downloaded. Open it to add the contact.');
+  if (!isPhone) onStatus('Contact card downloaded. Open it to add the contact.');
 }
 
 export function ProfilePage() {
