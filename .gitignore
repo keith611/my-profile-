@@ -1,0 +1,8 @@
+node_modules
+dist
+.env
+data/*.xlsx
+data/*.xlsx.tmp
+*.log
+.DS_Store
+frontend/dist
