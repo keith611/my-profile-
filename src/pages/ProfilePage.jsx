@@ -157,7 +157,7 @@ export function ProfilePage() {
                   return (
                     <ProjectTag className="project-item" role="listitem" key={item.name} {...(item.url ? { href: item.url, target: '_blank', rel: 'noreferrer', 'aria-label': `Visit ${item.name} website` } : {})}>
                       {item.image ? <img className="project-image" src={item.image} alt="" loading="lazy" /> : <span className="project-image project-image-fallback" aria-hidden="true">{item.name.split(/\s+/).map((word) => word[0]).slice(0, 2).join('')}</span>}
-                      <span className="project-text"><span className={`project-status ${item.url ? 'project-status-live' : ''}`}>{item.status}</span><strong>{item.name}</strong><small>{item.description}</small></span>
+                      <span className="project-text"><span className={`project-status ${item.url ? 'project-status-live' : ''}`}>{item.status}</span><strong>{item.name}</strong>{item.description && <small>{item.description}</small>}</span>
                       {item.url && <span className="project-arrow" aria-hidden="true">↗</span>}
                     </ProjectTag>
                   );

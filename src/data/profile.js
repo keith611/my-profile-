@@ -33,7 +33,6 @@ export const profile = {
     },
     {
       name: 'Africa Dining & Travel Guide',
-      description: 'Explore African dining and travel.',
       url: 'https://african-dining-travel.vercel.app',
       status: 'Live website',
     },
