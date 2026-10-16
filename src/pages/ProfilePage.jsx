@@ -7,7 +7,7 @@ function initials(name) {
   return (name || ' ').trim().split(/\s+/).slice(0, 2).map((part) => part[0] || '').join('').toUpperCase();
 }
 
-async function contactFile(onStatus) {
+async function contactFile(onStatus, forceDownload = false) {
   const escapeVCard = (value = '') => value.replace(/\\/g, '\\\\').replace(/\n/g, '\\n').replace(/,/g, '\\,').replace(/;/g, '\\;');
   const lines = [
     'BEGIN:VCARD', 'VERSION:3.0', `FN:${escapeVCard(profile.name)}`,
@@ -21,10 +21,10 @@ async function contactFile(onStatus) {
   const link = document.createElement('a');
   const isPhone = navigator.userAgentData?.mobile || /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
   const isAndroid = /Android/i.test(navigator.userAgent);
-  if (isPhone) {
+  if (isPhone && !forceDownload) {
     if (isAndroid) {
       const androidContactIntent = [
-        'intent://contacts/people/#Intent',
+        'intent:#Intent',
         'action=android.intent.action.INSERT',
         'type=vnd.android.cursor.dir/contact',
         `S.name=${encodeURIComponent(profile.name || '')}`,
@@ -36,6 +36,12 @@ async function contactFile(onStatus) {
       ].join(';');
       onStatus('Opening Contacts with your details ready to save.');
       window.location.href = androidContactIntent;
+      window.setTimeout(() => {
+        if (document.visibilityState === 'visible') {
+          onStatus('Contacts did not open. Your browser may block direct app launches.');
+          setContactFallbackVisible(true);
+        }
+      }, 1200);
       return;
     }
 
@@ -67,6 +73,7 @@ export function ProfilePage() {
   const [qrOpen, setQrOpen] = useState(false);
   const [nfcOpen, setNfcOpen] = useState(false);
   const [status, setStatus] = useState('');
+  const [contactFallbackVisible, setContactFallbackVisible] = useState(false);
   const phones = profile.phones || [];
   const links = profile.links.filter((item) => item.label && item.url);
   const projects = links.filter((item) => ['Fidika', 'Africa Dining'].includes(item.label));
@@ -153,9 +160,10 @@ export function ProfilePage() {
           <p className="profile-role">{[profile.role, profile.organization].filter(Boolean).join(' · ')}</p>
           <p className="hero-summary">Turning ideas into useful software and working products.</p>
           <div className="hero-actions">
-            <button className="button button-primary" onClick={() => contactFile(setStatus)} type="button"><span aria-hidden="true">＋</span> Save Contact</button>
+            <button className="button button-primary" onClick={() => { setContactFallbackVisible(false); contactFile(setStatus); }} type="button"><span aria-hidden="true">＋</span> Save Contact</button>
             <button className="button button-secondary" onClick={shareProfile} type="button"><span aria-hidden="true">↗</span> Connect</button>
           </div>
+          {contactFallbackVisible && <button className="contact-fallback" onClick={() => { setContactFallbackVisible(false); contactFile(setStatus, true); }} type="button">Download contact file instead</button>}
         </section>
 
         <div className="profile-content">
