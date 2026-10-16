@@ -7,7 +7,7 @@ function initials(name) {
   return (name || ' ').trim().split(/\s+/).slice(0, 2).map((part) => part[0] || '').join('').toUpperCase();
 }
 
-function contactFile() {
+function contactFile(onStatus) {
   const escapeVCard = (value = '') => value.replace(/\\/g, '\\\\').replace(/\n/g, '\\n').replace(/,/g, '\\,').replace(/;/g, '\\;');
   const lines = [
     'BEGIN:VCARD', 'VERSION:3.0', `FN:${escapeVCard(profile.name)}`,
@@ -20,9 +20,18 @@ function contactFile() {
   const fileUrl = URL.createObjectURL(file);
   const link = document.createElement('a');
   link.href = fileUrl;
+  const isPhone = navigator.userAgentData?.mobile || /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+  if (isPhone) {
+    onStatus('Opening your contact card. Follow your phone’s prompt to add it to Contacts.');
+    window.location.assign(fileUrl);
+    window.setTimeout(() => URL.revokeObjectURL(fileUrl), 60_000);
+    return;
+  }
+
   link.download = `${(profile.name || 'contact').trim().replace(/\s+/g, '-')}.vcf`;
   link.click();
   window.setTimeout(() => URL.revokeObjectURL(fileUrl), 1000);
+  onStatus('Contact card downloaded. Open it to add the contact.');
 }
 
 export function ProfilePage() {
@@ -115,7 +124,7 @@ export function ProfilePage() {
           <p className="profile-role">{[profile.role, profile.organization].filter(Boolean).join(' · ')}</p>
           <p className="hero-summary">Turning ideas into useful software and working products.</p>
           <div className="hero-actions">
-            <button className="button button-primary" onClick={contactFile} type="button"><span aria-hidden="true">＋</span> Save Contact</button>
+            <button className="button button-primary" onClick={() => contactFile(setStatus)} type="button"><span aria-hidden="true">＋</span> Save Contact</button>
             <button className="button button-secondary" onClick={shareProfile} type="button"><span aria-hidden="true">↗</span> Connect</button>
           </div>
         </section>
