@@ -15,5 +15,7 @@ export const profile = {
     { label: 'Fidika', url: 'https://fidika-site.vercel.app' },
     { label: 'Africa Dining', url: 'https://african-dining-travel.vercel.app' },
     { label: 'GitHub', url: 'https://github.com/keith611' },
+    { label: 'LinkedIn', url: 'https://www.linkedin.com/in/david-keith-2420892b8?utm_source=share_via&utm_content=profile&utm_medium=member_android' },
+    { label: 'Instagram', url: 'https://www.instagram.com/keithdavid982?obrf=b2M5NzZ0ZHVnbWwz' },
   ],
 };
