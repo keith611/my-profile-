@@ -14,5 +14,6 @@ export const profile = {
   links: [
     { label: 'Fidika', url: 'https://fidika-site.vercel.app' },
     { label: 'Africa Dining', url: 'https://african-dining-travel.vercel.app' },
+    { label: 'GitHub', url: 'https://github.com/keith611' },
   ],
 };

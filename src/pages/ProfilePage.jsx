@@ -109,7 +109,7 @@ export function ProfilePage() {
                 <span className="section-index">03</span>
                 <h2 id="work-heading">A few things I’ve built</h2>
               </div>
-              <nav className="profile-links" aria-label="Websites and projects">
+              <nav className="profile-links" aria-label="Websites and profiles">
                 {links.map((item, index) => (
                   <a key={item.label} href={item.url} target="_blank" rel="noreferrer">
                     <span className="project-number">0{index + 1}</span>
