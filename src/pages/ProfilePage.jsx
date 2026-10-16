@@ -1,3 +1,5 @@
+import { useState } from 'react';
+import { QRCodeSVG } from 'qrcode.react';
 import { profile } from '../data/profile.js';
 import './ProfilePage.css';
 
@@ -27,8 +29,41 @@ function contactFile() {
 }
 
 export function ProfilePage() {
+  const [qrOpen, setQrOpen] = useState(false);
+  const [shareStatus, setShareStatus] = useState('');
   const phones = profile.phones || [];
   const links = profile.links.filter((item) => item.label && item.url);
+  const profileUrl = `${window.location.origin}/profile`;
+  const digits = (phones[0] || '').replace(/\D/g, '');
+  const whatsappPhone = digits.startsWith('254') ? digits : digits.startsWith('0') ? `254${digits.slice(1)}` : digits;
+  const whatsappUrl = whatsappPhone
+    ? `https://wa.me/${whatsappPhone}?text=${encodeURIComponent(`Hi ${profile.name}, I found your profile on Vexa.`)}`
+    : '';
+
+  const shareProfile = async () => {
+    const shareData = {
+      title: `${profile.name} · Vexa`,
+      text: 'Connect with me on Vexa.',
+      url: profileUrl,
+    };
+
+    if (navigator.share) {
+      try {
+        await navigator.share(shareData);
+        setShareStatus('Profile shared.');
+        return;
+      } catch (error) {
+        if (error.name === 'AbortError') return;
+      }
+    }
+
+    try {
+      await navigator.clipboard.writeText(profileUrl);
+      setShareStatus('Profile link copied.');
+    } catch {
+      setShareStatus('Copy the profile address from your browser to share it.');
+    }
+  };
 
   return (
     <main className="profile-shell">
@@ -96,11 +131,22 @@ export function ProfilePage() {
                   <span><small>EMAIL</small><strong>{profile.email}</strong></span>
                 </a>
               )}
+              {whatsappUrl && (
+                <a className="contact-action contact-whatsapp" href={whatsappUrl} target="_blank" rel="noreferrer">
+                  <span className="action-icon" aria-hidden="true">WA</span>
+                  <span><small>MESSAGE ME</small><strong>WhatsApp</strong></span>
+                </a>
+              )}
               <button className="contact-action contact-save" onClick={contactFile} type="button">
                 <span className="action-icon" aria-hidden="true">＋</span>
                 <span><small>KEEP IN TOUCH</small><strong>Save contact</strong></span>
               </button>
+              <button className="contact-action contact-share" onClick={shareProfile} type="button">
+                <span className="action-icon" aria-hidden="true">↗</span>
+                <span><small>PASS IT ON</small><strong>Share profile</strong></span>
+              </button>
             </div>
+            <p className="share-status" role="status" aria-live="polite">{shareStatus}</p>
           </section>
 
           {links.length > 0 && (
@@ -120,6 +166,44 @@ export function ProfilePage() {
               </nav>
             </section>
           )}
+
+          <section className="qr-section" aria-labelledby="qr-heading">
+            <div className="qr-section-top">
+              <div className="section-heading section-heading-compact">
+                <span className="section-index">04</span>
+                <h2 id="qr-heading">No NFC? Scan instead.</h2>
+              </div>
+              <button
+                className="qr-toggle"
+                type="button"
+                aria-expanded={qrOpen}
+                aria-controls="profile-qr-panel"
+                onClick={() => setQrOpen((open) => !open)}
+              >
+                {qrOpen ? 'Hide QR' : 'Show QR'}
+                <span aria-hidden="true">{qrOpen ? '−' : '+'}</span>
+              </button>
+            </div>
+            {qrOpen && (
+              <div className="profile-qr-panel" id="profile-qr-panel">
+                <div className="qr-code-shell">
+                  <QRCodeSVG
+                    value={profileUrl}
+                    size={156}
+                    level="M"
+                    includeMargin
+                    title={`QR code for ${profile.name}'s Vexa profile`}
+                    bgColor="#ffffff"
+                    fgColor="#111622"
+                  />
+                </div>
+                <div className="qr-copy">
+                  <strong>Scan to open this profile</strong>
+                  <span>Save the QR code or scan it with your phone camera to connect.</span>
+                </div>
+              </div>
+            )}
+          </section>
         </div>
       </section>
 
