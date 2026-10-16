@@ -11,6 +11,24 @@ export const profile = {
   email: 'keithdavid982@gmail.com',
   phones: ['0799451809', '0787636812'],
   photo: '',
+  projects: [
+    {
+      name: 'Fidika',
+      description: 'A finance and transaction insights concept for Kenyan businesses.',
+      image: '/projects/fidika.jpg',
+      url: 'https://fidika-site.vercel.app',
+    },
+    {
+      name: 'Vexa',
+      description: 'A smarter way to exchange professional identities and build lasting connections.',
+      image: '/projects/vexa.jpg',
+    },
+    {
+      name: 'Nia',
+      description: 'A vision for an AI-powered home assistant designed around African families.',
+      image: '/projects/nia.jpg',
+    },
+  ],
   links: [
     { label: 'Fidika', url: 'https://fidika-site.vercel.app' },
     { label: 'Africa Dining', url: 'https://african-dining-travel.vercel.app' },

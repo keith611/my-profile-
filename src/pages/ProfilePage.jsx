@@ -13,7 +13,8 @@ export function ProfilePage() {
   const [status, setStatus] = useState('');
   const phones = profile.phones || [];
   const links = profile.links.filter((item) => item.label && item.url);
-  const projects = links.filter((item) => ['Fidika', 'Africa Dining'].includes(item.label));
+  const projects = profile.projects || [];
+  const africaDining = links.find((item) => item.label === 'Africa Dining');
   const socialLinks = links.filter((item) => ['GitHub', 'LinkedIn', 'Instagram'].includes(item.label));
   const profileUrl = `${window.location.origin}/profile`;
   const whatsappDigits = (phones[1] || '').replace(/\D/g, '');
@@ -120,15 +121,23 @@ export function ProfilePage() {
           {projects.length > 0 && (
             <section className="content-section" aria-labelledby="projects-heading">
               <h2 id="projects-heading">Selected projects</h2>
-              <nav className="project-list" aria-label="Selected projects">
-                {projects.map((item, index) => (
-                  <a className="project-item" key={item.label} href={item.url} target="_blank" rel="noreferrer">
-                    <span className={`project-mark project-mark-${index + 1}`} aria-hidden="true">{index === 0 ? 'F' : 'A'}</span>
-                    <span className="project-text"><strong>{item.label}</strong><small>Explore project <span aria-hidden="true">↗</span></small></span>
-                    <span className="project-arrow" aria-hidden="true">↗</span>
-                  </a>
+              <div className="project-list" role="list" aria-label="Selected projects">
+                {projects.map((item) => (
+                  item.url ? (
+                    <a className="project-item" role="listitem" key={item.name} href={item.url} target="_blank" rel="noreferrer">
+                      <img className="project-image" src={item.image} alt="" />
+                      <span className="project-text"><strong>{item.name}</strong><small>{item.description}</small></span>
+                      <span className="project-arrow" aria-hidden="true">↗</span>
+                    </a>
+                  ) : (
+                    <article className="project-item" role="listitem" key={item.name}>
+                      <img className="project-image" src={item.image} alt="" />
+                      <span className="project-text"><strong>{item.name}</strong><small>{item.description}</small></span>
+                    </article>
+                  )
                 ))}
-              </nav>
+              </div>
+              {africaDining && <a className="more-project-link" href={africaDining.url} target="_blank" rel="noreferrer">Also explore Africa Dining <span aria-hidden="true">↗</span></a>}
             </section>
           )}
 
