@@ -10,7 +10,7 @@ export const profile = {
   location: 'Nairobi, Kenya',
   email: 'keithdavid982@gmail.com',
   phones: ['0799451809', '0787636812'],
-  photo: '',
+  photo: '/david-keith-profile.jpg',
   projects: [
     {
       name: 'Fidika',
