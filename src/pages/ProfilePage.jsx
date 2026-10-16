@@ -34,7 +34,7 @@ export function ProfilePage() {
   const phones = profile.phones || [];
   const links = profile.links.filter((item) => item.label && item.url);
   const profileUrl = `${window.location.origin}/profile`;
-  const digits = (phones[0] || '').replace(/\D/g, '');
+  const digits = (phones[1] || '').replace(/\D/g, '');
   const whatsappPhone = digits.startsWith('254') ? digits : digits.startsWith('0') ? `254${digits.slice(1)}` : digits;
   const whatsappUrl = whatsappPhone
     ? `https://wa.me/${whatsappPhone}?text=${encodeURIComponent(`Hi ${profile.name}, I found your profile on Vexa.`)}`
