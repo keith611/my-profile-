@@ -285,6 +285,8 @@
 .qr-copy { display: grid; gap: 7px; }
 .qr-copy strong { color: #f6f3fb; font-size: 12px; }
 .qr-copy span { color: #b8bdcc; font-size: 10px; line-height: 1.6; }
+.qr-download-button { justify-self: start; min-height: 34px; margin-top: 3px; padding: 0 11px; border: 1px solid rgba(89,224,193,.34); border-radius: 8px; color: #aaf1e1; background: rgba(27,166,145,.15); font-size: 10px; font-weight: 700; cursor: pointer; transition: background .2s ease, border-color .2s ease, transform .2s ease; }
+.qr-download-button:hover { transform: translateY(-1px); border-color: rgba(89,224,193,.7); background: rgba(27,166,145,.25); }
 
 .nfc-setup-section { padding-top: 18px; border-top: 1px solid rgba(255,255,255,.1); }
 .nfc-setup-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
@@ -335,5 +337,5 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .profile-card, .profile-avatar-wrap, .identity-orbit, .contact-action, .profile-links a, .profile-qr-panel, .nfc-setup-panel { animation: none; transition: none; }
+  .profile-card, .profile-avatar-wrap, .identity-orbit, .contact-action, .profile-links a, .profile-qr-panel, .nfc-setup-panel, .qr-download-button { animation: none; transition: none; }
 }

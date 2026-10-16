@@ -84,6 +84,34 @@ export function ProfilePage() {
     }
   };
 
+  const downloadQrCode = () => {
+    const source = document.querySelector('#profile-qr-panel svg');
+    if (!source) {
+      setShareStatus('Open the QR code first, then download it.');
+      return;
+    }
+
+    const svg = source.cloneNode(true);
+    const [width, height] = svg.getAttribute('viewBox').split(' ').slice(2).map(Number);
+    svg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+    svg.setAttribute('width', width);
+    svg.setAttribute('height', height);
+    const background = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+    background.setAttribute('width', '100%');
+    background.setAttribute('height', '100%');
+    background.setAttribute('fill', '#ffffff');
+    svg.insertBefore(background, svg.firstChild);
+
+    const file = new Blob([new XMLSerializer().serializeToString(svg)], { type: 'image/svg+xml;charset=utf-8' });
+    const fileUrl = URL.createObjectURL(file);
+    const link = document.createElement('a');
+    link.href = fileUrl;
+    link.download = 'David-Keith-Egwa-QR-Code.svg';
+    link.click();
+    window.setTimeout(() => URL.revokeObjectURL(fileUrl), 1000);
+    setShareStatus('QR code downloaded. It is ready to print or share.');
+  };
+
   return (
     <main className="profile-shell">
       <div className="profile-atmosphere" aria-hidden="true" />
@@ -224,7 +252,8 @@ export function ProfilePage() {
                 </div>
                 <div className="qr-copy">
                   <strong>Scan to open this profile</strong>
-                  <span>Save the QR code or scan it with your phone camera to connect.</span>
+                  <span>Download the QR code to print it or share it as an image.</span>
+                  <button className="qr-download-button" type="button" onClick={downloadQrCode}>Download QR code</button>
                 </div>
               </div>
             )}
