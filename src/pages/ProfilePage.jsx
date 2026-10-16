@@ -30,6 +30,7 @@ function contactFile() {
 
 export function ProfilePage() {
   const [qrOpen, setQrOpen] = useState(false);
+  const [nfcOpen, setNfcOpen] = useState(false);
   const [shareStatus, setShareStatus] = useState('');
   const phones = profile.phones || [];
   const links = profile.links.filter((item) => item.label && item.url);
@@ -62,6 +63,24 @@ export function ProfilePage() {
       setShareStatus('Profile link copied.');
     } catch {
       setShareStatus('Copy the profile address from your browser to share it.');
+    }
+  };
+
+  const copyDetail = async (value, label) => {
+    try {
+      await navigator.clipboard.writeText(value);
+      setShareStatus(`${label} copied.`);
+    } catch {
+      setShareStatus(`Could not copy ${label.toLowerCase()}. Please copy it from the profile.`);
+    }
+  };
+
+  const checkProfileLink = async () => {
+    try {
+      const response = await fetch(profileUrl, { method: 'HEAD', cache: 'no-store' });
+      setShareStatus(response.ok ? 'Profile link is reachable and ready to add to your NFC card.' : 'Profile link could not be reached. Check the deployed website and try again.');
+    } catch {
+      setShareStatus('Profile link could not be reached. Check your connection and try again.');
     }
   };
 
@@ -120,16 +139,22 @@ export function ProfilePage() {
             </div>
             <div className="profile-actions">
               {phones.map((phone, index) => (
-                <a key={phone} className="contact-action contact-call" href={`tel:${phone}`} aria-label={`Call ${phone}`}>
-                  <span className="action-icon" aria-hidden="true">↗</span>
-                  <span><small>{index === 0 ? 'PHONE' : 'ALTERNATE'}</small><strong>{phone.replace(/^(\d{4})(\d{3})(\d{3})$/, '$1 $2 $3')}</strong></span>
-                </a>
+                <div key={phone} className="contact-action-wrap">
+                  <a className="contact-action contact-call" href={`tel:${phone}`} aria-label={`Call ${phone}`}>
+                    <span className="action-icon" aria-hidden="true">↗</span>
+                    <span><small>{index === 0 ? 'PHONE' : 'ALTERNATE'}</small><strong>{phone.replace(/^(\d{4})(\d{3})(\d{3})$/, '$1 $2 $3')}</strong></span>
+                  </a>
+                  <button className="copy-action" onClick={() => copyDetail(phone, 'Phone number')} type="button" aria-label={`Copy phone number ${phone}`}>Copy</button>
+                </div>
               ))}
               {profile.email && (
-                <a className="contact-action contact-email" href={`mailto:${profile.email}`}>
-                  <span className="action-icon" aria-hidden="true">@</span>
-                  <span><small>EMAIL</small><strong>{profile.email}</strong></span>
-                </a>
+                <div className="contact-action-wrap">
+                  <a className="contact-action contact-email" href={`mailto:${profile.email}`}>
+                    <span className="action-icon" aria-hidden="true">@</span>
+                    <span><small>EMAIL</small><strong>{profile.email}</strong></span>
+                  </a>
+                  <button className="copy-action" onClick={() => copyDetail(profile.email, 'Email address')} type="button" aria-label={`Copy email address ${profile.email}`}>Copy</button>
+                </div>
               )}
               {whatsappUrl && (
                 <a className="contact-action contact-whatsapp" href={whatsappUrl} target="_blank" rel="noreferrer">
@@ -201,6 +226,40 @@ export function ProfilePage() {
                   <strong>Scan to open this profile</strong>
                   <span>Save the QR code or scan it with your phone camera to connect.</span>
                 </div>
+              </div>
+            )}
+          </section>
+
+          <section className="nfc-setup-section" aria-labelledby="nfc-setup-heading">
+            <div className="nfc-setup-top">
+              <div className="section-heading section-heading-compact">
+                <span className="section-index">05</span>
+                <h2 id="nfc-setup-heading">Set up your NFC card</h2>
+              </div>
+              <button
+                className="qr-toggle"
+                type="button"
+                aria-expanded={nfcOpen}
+                aria-controls="nfc-setup-panel"
+                onClick={() => setNfcOpen((open) => !open)}
+              >
+                {nfcOpen ? 'Close' : 'Setup check'}
+                <span aria-hidden="true">{nfcOpen ? '−' : '+'}</span>
+              </button>
+            </div>
+            {nfcOpen && (
+              <div className="nfc-setup-panel" id="nfc-setup-panel">
+                <p>Use this profile address as the link on your NFC card:</p>
+                <div className="nfc-profile-url">
+                  <code>{profileUrl}</code>
+                  <button type="button" onClick={() => copyDetail(profileUrl, 'Profile link')}>Copy link</button>
+                </div>
+                <ol>
+                  <li>Write this link to your NFC card with your phone’s NFC writing app.</li>
+                  <li>Tap the card with another phone and confirm this profile opens.</li>
+                </ol>
+                <button className="nfc-check-button" type="button" onClick={checkProfileLink}>Check profile link</button>
+                <span className="nfc-check-note">This checks that the website address responds. Tap your card with another phone to confirm the NFC setup itself.</span>
               </div>
             )}
           </section>
