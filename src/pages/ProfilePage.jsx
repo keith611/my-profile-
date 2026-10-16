@@ -110,10 +110,10 @@ export function ProfilePage() {
             <span className="avatar-caption">NAIROBI · KENYA</span>
           </div>
 
-          <p className="profile-kicker">CEO · TECHNOLOGY BUILDER</p>
+          <p className="profile-kicker">TECHNOLOGY BUILDER · ASPIRING ENTREPRENEUR</p>
           <h1 id="profile-name">{profile.name || 'Your name'}</h1>
           <p className="profile-role">{[profile.role, profile.organization].filter(Boolean).join(' · ')}</p>
-          <p className="hero-summary">Building practical systems, apps, and websites with code.</p>
+          <p className="hero-summary">Turning ideas into useful software and working products.</p>
           <div className="hero-actions">
             <button className="button button-primary" onClick={contactFile} type="button"><span aria-hidden="true">＋</span> Save Contact</button>
             <button className="button button-secondary" onClick={shareProfile} type="button"><span aria-hidden="true">↗</span> Connect</button>
@@ -123,15 +123,15 @@ export function ProfilePage() {
         <div className="profile-content">
           <section className="content-section about-section" aria-labelledby="about-heading">
             <h2 id="about-heading">About me</h2>
-            <p>I’m a technology builder and entrepreneur who enjoys turning ideas into practical systems, apps, and websites. I work with Python, React, Vite, Kotlin, and databases to create useful digital products.</p>
+            <p>An emerging technology professional passionate about creating useful software, building systems, apps, and websites, and turning ideas into working products.</p>
           </section>
 
           <section className="content-section" aria-labelledby="skills-heading">
             <h2 id="skills-heading">What I do</h2>
             <ul className="skills-list">
-              <li><span className="skill-icon" aria-hidden="true">&lt;/&gt;</span><span><strong>Software development</strong><small>Python, React, Vite, and Kotlin</small></span></li>
-              <li><span className="skill-icon" aria-hidden="true">◈</span><span><strong>Systems &amp; databases</strong><small>Building connected apps, websites, and data systems</small></span></li>
-              <li><span className="skill-icon" aria-hidden="true">✳</span><span><strong>Product building</strong><small>Turning ideas into practical digital products</small></span></li>
+              <li><span className="skill-icon" aria-hidden="true">&lt;/&gt;</span><span><strong>Software development</strong><small>Python, React, Vite, Kotlin, and databases</small></span></li>
+              <li><span className="skill-icon" aria-hidden="true">◈</span><span><strong>Systems &amp; applications</strong><small>Building useful systems, apps, and websites</small></span></li>
+              <li><span className="skill-icon" aria-hidden="true">✳</span><span><strong>Product building</strong><small>Ideas, prototypes, and startup projects</small></span></li>
             </ul>
           </section>
 
