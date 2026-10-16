@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { QRCodeSVG } from 'qrcode.react';
 import { profile } from '../data/profile.js';
+import { createVCard } from '../utils/vcard.js';
 import './ProfilePage.css';
 
 function initials(name) {
@@ -11,12 +12,12 @@ export function ProfilePage() {
   const [qrOpen, setQrOpen] = useState(false);
   const [nfcOpen, setNfcOpen] = useState(false);
   const [status, setStatus] = useState('');
+  const [photoFailed, setPhotoFailed] = useState(false);
   const phones = profile.phones || [];
   const links = profile.links.filter((item) => item.label && item.url);
   const projects = profile.projects || [];
-  const africaDining = links.find((item) => item.label === 'Africa Dining');
   const socialLinks = links.filter((item) => ['GitHub', 'LinkedIn', 'Instagram'].includes(item.label));
-  const profileUrl = `${window.location.origin}/profile`;
+  const profileUrl = import.meta.env.VITE_PUBLIC_PROFILE_URL || 'https://frontend-git-main-sam-tucker-s-projects1.vercel.app/profile';
   const whatsappDigits = (phones[1] || '').replace(/\D/g, '');
   const whatsappPhone = whatsappDigits.startsWith('254') ? whatsappDigits : whatsappDigits.startsWith('0') ? `254${whatsappDigits.slice(1)}` : whatsappDigits;
   const whatsappUrl = whatsappPhone ? `https://wa.me/${whatsappPhone}?text=${encodeURIComponent(`Hi ${profile.name}, I found your profile on Vexa.`)}` : '';
@@ -31,16 +32,44 @@ export function ProfilePage() {
         if (error.name === 'AbortError') return;
       }
     }
-    copyDetail(profileUrl, 'Profile link');
+    await copyDetail(profileUrl, 'Profile link');
   };
 
   const copyDetail = async (value, label) => {
     try {
-      await navigator.clipboard.writeText(value);
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(value);
+      } else {
+        const input = document.createElement('textarea');
+        input.value = value;
+        input.setAttribute('readonly', '');
+        input.style.position = 'fixed';
+        input.style.opacity = '0';
+        document.body.append(input);
+        input.select();
+        const copied = document.execCommand('copy');
+        input.remove();
+        if (!copied) throw new Error('Clipboard unavailable');
+      }
       setStatus(`${label} copied.`);
+      return true;
     } catch {
       setStatus(`Could not copy ${label.toLowerCase()}. Please copy it from the profile.`);
+      return false;
     }
+  };
+
+  const saveContact = () => {
+    const blob = new Blob([createVCard({ profile, phones, profileUrl, links })], { type: 'text/vcard;charset=utf-8' });
+    const fileUrl = URL.createObjectURL(blob);
+    const anchor = document.createElement('a');
+    anchor.href = fileUrl;
+    anchor.download = 'David-Keith-Egwa.vcf';
+    document.body.append(anchor);
+    anchor.click();
+    anchor.remove();
+    window.setTimeout(() => URL.revokeObjectURL(fileUrl), 1000);
+    setStatus('Contact card ready to import into your contacts.');
   };
 
   const checkProfileLink = async () => {
@@ -88,8 +117,8 @@ export function ProfilePage() {
             <span className="identity-tag">PERSONAL PROFILE</span>
           </header>
 
-          <div className="hero-avatar" aria-label={`${profile.name} profile photo placeholder`}>
-            {profile.photo ? <img src={profile.photo} alt={profile.name} /> : <span>{initials(profile.name)}</span>}
+          <div className="hero-avatar" role="img" aria-label={profile.photo && !photoFailed ? `${profile.name} profile photo` : `${profile.name} initials`}>
+            {profile.photo && !photoFailed ? <img src={profile.photo} alt={profile.name} onError={() => setPhotoFailed(true)} /> : <span>{initials(profile.name)}</span>}
             <span className="avatar-caption">NAIROBI · KENYA</span>
           </div>
 
@@ -98,8 +127,9 @@ export function ProfilePage() {
           <p className="profile-role">{[profile.role, profile.organization].filter(Boolean).join(' · ')}</p>
           <p className="hero-summary">Turning ideas into useful software and working products.</p>
           <div className="hero-actions">
-            {phones[0] && <a className="button button-primary" href={`tel:${phones[0]}`}><span aria-hidden="true">☎</span> Call Me</a>}
-            <button className="button button-secondary" onClick={shareProfile} type="button"><span aria-hidden="true">↗</span> Connect</button>
+            <button className="button button-primary" onClick={saveContact} type="button"><span aria-hidden="true">＋</span> Save Contact</button>
+            <button className="button button-secondary" onClick={shareProfile} type="button"><span aria-hidden="true">↗</span> Share Profile</button>
+            {phones[0] && <a className="button button-tertiary" href={`tel:${phones[0]}`}><span aria-hidden="true">☎</span> Call</a>}
           </div>
         </section>
 
@@ -122,22 +152,17 @@ export function ProfilePage() {
             <section className="content-section" aria-labelledby="projects-heading">
               <h2 id="projects-heading">Selected projects</h2>
               <div className="project-list" role="list" aria-label="Selected projects">
-                {projects.map((item) => (
-                  item.url ? (
-                    <a className="project-item" role="listitem" key={item.name} href={item.url} target="_blank" rel="noreferrer">
-                      <img className="project-image" src={item.image} alt="" />
-                      <span className="project-text"><strong>{item.name}</strong><small>{item.description}</small></span>
-                      <span className="project-arrow" aria-hidden="true">↗</span>
-                    </a>
-                  ) : (
-                    <article className="project-item" role="listitem" key={item.name}>
-                      <img className="project-image" src={item.image} alt="" />
-                      <span className="project-text"><strong>{item.name}</strong><small>{item.description}</small></span>
-                    </article>
-                  )
-                ))}
+                {projects.map((item) => {
+                  const ProjectTag = item.url ? 'a' : 'article';
+                  return (
+                    <ProjectTag className="project-item" role="listitem" key={item.name} {...(item.url ? { href: item.url, target: '_blank', rel: 'noreferrer', 'aria-label': `Visit ${item.name} website` } : {})}>
+                      {item.image ? <img className="project-image" src={item.image} alt="" loading="lazy" /> : <span className="project-image project-image-fallback" aria-hidden="true">{item.name.split(/\s+/).map((word) => word[0]).slice(0, 2).join('')}</span>}
+                      <span className="project-text"><span className={`project-status ${item.url ? 'project-status-live' : ''}`}>{item.status}</span><strong>{item.name}</strong><small>{item.description}</small></span>
+                      {item.url && <span className="project-arrow" aria-hidden="true">↗</span>}
+                    </ProjectTag>
+                  );
+                })}
               </div>
-              {africaDining && <a className="more-project-link" href={africaDining.url} target="_blank" rel="noreferrer">Also explore Africa Dining <span aria-hidden="true">↗</span></a>}
             </section>
           )}
 
@@ -154,7 +179,7 @@ export function ProfilePage() {
               {phones[0] && <a href={`tel:${phones[0]}`} aria-label={`Call ${phones[0]}`} title="Call"><span className="social-mark" aria-hidden="true">☎</span><small>Call</small></a>}
               {whatsappUrl && <a href={whatsappUrl} target="_blank" rel="noreferrer" aria-label="WhatsApp" title="WhatsApp"><span className="social-mark social-mark-whatsapp" aria-hidden="true">WA</span><small>WhatsApp</small></a>}
             </nav>
-            <div className="direct-contact">
+            <div className="direct-contact" aria-label="Copy contact details">
               {profile.email && <button type="button" onClick={() => copyDetail(profile.email, 'Email address')}>Copy email</button>}
               {phones.map((phone) => <button type="button" key={phone} onClick={() => copyDetail(phone, 'Phone number')}>Copy {phone}</button>)}
             </div>
@@ -169,7 +194,7 @@ export function ProfilePage() {
             {qrOpen && (
               <div className="profile-qr-panel" id="profile-qr-panel">
                 <div className="qr-code-shell"><QRCodeSVG value={profileUrl} size={156} level="M" includeMargin title={`QR code for ${profile.name}'s Vexa profile`} bgColor="#ffffff" fgColor="#111622" /></div>
-                <div className="qr-copy"><strong>Scan to open this profile</strong><small>Download to print or share.</small><button className="button button-primary qr-download-button" type="button" onClick={downloadQrCode}>Download QR code</button></div>
+                <div className="qr-copy"><strong>Scan to open this profile</strong><small>Or copy and share the profile link.</small><button className="button button-secondary qr-download-button" type="button" onClick={() => copyDetail(profileUrl, 'Profile link')}>Copy profile link</button><button className="button button-primary qr-download-button" type="button" onClick={downloadQrCode}>Download QR code</button></div>
               </div>
             )}
             <div className="nfc-setup">

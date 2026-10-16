@@ -17,16 +17,25 @@ export const profile = {
       description: 'A finance and transaction insights concept for Kenyan businesses.',
       image: '/projects/fidika.jpg',
       url: 'https://fidika-site.vercel.app',
+      status: 'Live website',
     },
     {
       name: 'Vexa',
       description: 'A smarter way to exchange professional identities and build lasting connections.',
       image: '/projects/vexa.jpg',
+      status: 'In development',
     },
     {
       name: 'Nia',
       description: 'A vision for an AI-powered home assistant designed around African families.',
       image: '/projects/nia.jpg',
+      status: 'Concept',
+    },
+    {
+      name: 'Africa Dining & Travel Guide',
+      description: 'Explore African dining and travel.',
+      url: 'https://african-dining-travel.vercel.app',
+      status: 'Live website',
     },
   ],
   links: [

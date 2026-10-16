@@ -21,8 +21,8 @@ The production site is generated in `dist`.
 
 ## Deploy
 
-The repository includes `vercel.json` for Vercel builds. Set the Vercel project root directory to the repository root (`./`). After deployment, write the site's public URL to the NFC card using an NFC writing app. The profile route works at `/` and at `/profile`.
+The repository includes `vercel.json` for Vercel builds. Set the Vercel project root directory to the repository root (`./`). The QR code, sharing action, and downloadable contact card use the stable public profile URL configured in `src/pages/ProfilePage.jsx`. Set `VITE_PUBLIC_PROFILE_URL` in Vercel to override that URL if the production domain changes. After deployment, write the same public URL to the NFC card using an NFC writing app. The profile route works at `/` and at `/profile`.
 
 ## Update profile details
 
-Edit `src/data/profile.js`. Add a profile photo at `public` and set `photo` to its public path. The contact card includes tap-to-call links, email, a downloadable vCard, and the Fidika and Africa Dining project links.
+Edit `src/data/profile.js`. Add a professional photo under `public` and set `photo` to its public path; DK initials remain as the fallback. This file also defines the project cards, contact details, and social links used by the downloadable vCard.
