@@ -20,7 +20,25 @@ async function contactFile(onStatus) {
   const fileName = `${(profile.name || 'contact').trim().replace(/\s+/g, '-')}.vcf`;
   const link = document.createElement('a');
   const isPhone = navigator.userAgentData?.mobile || /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+  const isAndroid = /Android/i.test(navigator.userAgent);
   if (isPhone) {
+    if (isAndroid) {
+      const androidContactIntent = [
+        'intent://contacts/people/#Intent',
+        'action=android.intent.action.INSERT',
+        'type=vnd.android.cursor.dir/contact',
+        `S.name=${encodeURIComponent(profile.name || '')}`,
+        `S.phone=${encodeURIComponent(profile.phones?.[0] || '')}`,
+        `S.email=${encodeURIComponent(profile.email || '')}`,
+        `S.company=${encodeURIComponent(profile.organization || '')}`,
+        `S.job_title=${encodeURIComponent(profile.role || '')}`,
+        'end',
+      ].join(';');
+      onStatus('Opening Contacts with your details ready to save.');
+      window.location.href = androidContactIntent;
+      return;
+    }
+
     const contact = new File([vCard], fileName, { type: 'text/vcard' });
     if (navigator.canShare?.({ files: [contact] }) && navigator.share) {
       try {
