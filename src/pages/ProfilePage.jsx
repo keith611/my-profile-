@@ -7,73 +7,10 @@ function initials(name) {
   return (name || ' ').trim().split(/\s+/).slice(0, 2).map((part) => part[0] || '').join('').toUpperCase();
 }
 
-async function contactFile(onStatus, forceDownload = false) {
-  const escapeVCard = (value = '') => value.replace(/\\/g, '\\\\').replace(/\n/g, '\\n').replace(/,/g, '\\,').replace(/;/g, '\\;');
-  const lines = [
-    'BEGIN:VCARD', 'VERSION:3.0', `FN:${escapeVCard(profile.name)}`,
-    `TITLE:${escapeVCard(profile.role)}`, `ORG:${escapeVCard(profile.organization)}`,
-    ...(profile.phones || []).map((phone) => `TEL;TYPE=CELL:${phone}`),
-    profile.email ? `EMAIL:${profile.email}` : '',
-    'END:VCARD',
-  ].filter(Boolean);
-  const vCard = new Blob([lines.join('\r\n')], { type: 'text/vcard;charset=utf-8' });
-  const fileName = `${(profile.name || 'contact').trim().replace(/\s+/g, '-')}.vcf`;
-  const link = document.createElement('a');
-  const isPhone = navigator.userAgentData?.mobile || /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-  const isAndroid = /Android/i.test(navigator.userAgent);
-  if (isPhone && !forceDownload) {
-    if (isAndroid) {
-      const androidContactIntent = [
-        'intent:#Intent',
-        'action=android.intent.action.INSERT',
-        'type=vnd.android.cursor.dir/contact',
-        `S.name=${encodeURIComponent(profile.name || '')}`,
-        `S.phone=${encodeURIComponent(profile.phones?.[0] || '')}`,
-        `S.email=${encodeURIComponent(profile.email || '')}`,
-        `S.company=${encodeURIComponent(profile.organization || '')}`,
-        `S.job_title=${encodeURIComponent(profile.role || '')}`,
-        'end',
-      ].join(';');
-      onStatus('Opening Contacts with your details ready to save.');
-      window.location.href = androidContactIntent;
-      window.setTimeout(() => {
-        if (document.visibilityState === 'visible') {
-          onStatus('Contacts did not open. Your browser may block direct app launches.');
-          setContactFallbackVisible(true);
-        }
-      }, 1200);
-      return;
-    }
-
-    const contact = new File([vCard], fileName, { type: 'text/vcard' });
-    if (navigator.canShare?.({ files: [contact] }) && navigator.share) {
-      try {
-        await navigator.share({ files: [contact], title: `Save ${profile.name} to Contacts` });
-        onStatus('Choose Contacts or your phone’s save-contact option to finish.');
-        return;
-      } catch (error) {
-        if (error.name === 'AbortError') {
-          onStatus('Contact sharing cancelled. Tap Save Contact to try again.');
-          return;
-        }
-      }
-    }
-    onStatus('Your browser cannot open the contact share menu. Opening the contact file instead.');
-  }
-
-  const fileUrl = URL.createObjectURL(vCard);
-  link.href = fileUrl;
-  link.download = `${(profile.name || 'contact').trim().replace(/\s+/g, '-')}.vcf`;
-  link.click();
-  window.setTimeout(() => URL.revokeObjectURL(fileUrl), 1000);
-  if (!isPhone) onStatus('Contact card downloaded. Open it to add the contact.');
-}
-
 export function ProfilePage() {
   const [qrOpen, setQrOpen] = useState(false);
   const [nfcOpen, setNfcOpen] = useState(false);
   const [status, setStatus] = useState('');
-  const [contactFallbackVisible, setContactFallbackVisible] = useState(false);
   const phones = profile.phones || [];
   const links = profile.links.filter((item) => item.label && item.url);
   const projects = links.filter((item) => ['Fidika', 'Africa Dining'].includes(item.label));
@@ -160,10 +97,9 @@ export function ProfilePage() {
           <p className="profile-role">{[profile.role, profile.organization].filter(Boolean).join(' · ')}</p>
           <p className="hero-summary">Turning ideas into useful software and working products.</p>
           <div className="hero-actions">
-            <button className="button button-primary" onClick={() => { setContactFallbackVisible(false); contactFile(setStatus); }} type="button"><span aria-hidden="true">＋</span> Save Contact</button>
+            {phones[0] && <a className="button button-primary" href={`tel:${phones[0]}`}><span aria-hidden="true">☎</span> Call Me</a>}
             <button className="button button-secondary" onClick={shareProfile} type="button"><span aria-hidden="true">↗</span> Connect</button>
           </div>
-          {contactFallbackVisible && <button className="contact-fallback" onClick={() => { setContactFallbackVisible(false); contactFile(setStatus, true); }} type="button">Download contact file instead</button>}
         </section>
 
         <div className="profile-content">
