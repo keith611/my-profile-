@@ -4,9 +4,13 @@
  */
 export const profile = {
   name: 'David Keith Egwa',
+  publicPath: '/profile',
+  title: 'Technology Builder · Aspiring Entrepreneur',
+  description: "David Keith Egwa's digital contact profile. Connect, call, email, and explore his work with Vexa and Fidika.",
   role: 'CEO',
   organization: 'Vexa · Fidika',
   bio: 'I build digital products from idea to launch—systems, apps, and websites. I work across Python, React and Vite, Kotlin, and databases, bringing the pieces together to create practical tools that work.',
+  about: 'An emerging technology professional passionate about creating useful software, building systems, apps, and websites, and turning ideas into working products.',
   location: 'Nairobi, Kenya',
   email: 'keithdavid982@gmail.com',
   phones: ['0799451809', '0787636812'],

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { QRCodeSVG } from 'qrcode.react';
 import { profile } from '../data/profile.js';
 import { createVCard } from '../utils/vcard.js';
@@ -8,19 +8,27 @@ function initials(name) {
   return (name || ' ').trim().split(/\s+/).slice(0, 2).map((part) => part[0] || '').join('').toUpperCase();
 }
 
-export function ProfilePage() {
+export function ProfilePage({ profileData = profile }) {
   const [qrOpen, setQrOpen] = useState(false);
   const [nfcOpen, setNfcOpen] = useState(false);
   const [status, setStatus] = useState('');
   const [photoFailed, setPhotoFailed] = useState(false);
+  const profile = profileData;
   const phones = profile.phones || [];
   const links = profile.links.filter((item) => item.label && item.url);
   const projects = profile.projects || [];
   const socialLinks = links.filter((item) => ['GitHub', 'LinkedIn', 'Instagram'].includes(item.label));
-  const profileUrl = import.meta.env.VITE_PUBLIC_PROFILE_URL || 'https://frontend-git-main-sam-tucker-s-projects1.vercel.app/profile';
+  const configuredProfileUrl = import.meta.env.VITE_PUBLIC_PROFILE_URL || 'https://frontend-git-main-sam-tucker-s-projects1.vercel.app/profile';
+  const profileUrl = new URL(profile.publicPath || '/profile', new URL(configuredProfileUrl).origin).toString();
   const whatsappDigits = (phones[1] || '').replace(/\D/g, '');
   const whatsappPhone = whatsappDigits.startsWith('254') ? whatsappDigits : whatsappDigits.startsWith('0') ? `254${whatsappDigits.slice(1)}` : whatsappDigits;
   const whatsappUrl = whatsappPhone ? `https://wa.me/${whatsappPhone}?text=${encodeURIComponent(`Hi ${profile.name}, I found your profile on Vexa.`)}` : '';
+
+  useEffect(() => {
+    document.title = `${profile.name} — Vexa Digital Profile`;
+    const description = document.querySelector('meta[name="description"]');
+    if (description) description.content = profile.description || profile.bio;
+  }, [profile.name]);
 
   const shareProfile = async () => {
     if (navigator.share) {
@@ -119,24 +127,24 @@ export function ProfilePage() {
 
           <div className="hero-avatar" role="img" aria-label={profile.photo && !photoFailed ? `${profile.name} profile photo` : `${profile.name} initials`}>
             {profile.photo && !photoFailed ? <img src={profile.photo} alt={profile.name} onError={() => setPhotoFailed(true)} /> : <span>{initials(profile.name)}</span>}
-            <span className="avatar-caption">NAIROBI · KENYA</span>
+            <span className="avatar-caption">{profile.location?.toUpperCase()}</span>
           </div>
 
-          <p className="profile-kicker">TECHNOLOGY BUILDER · ASPIRING ENTREPRENEUR</p>
+          <p className="profile-kicker">{profile.title}</p>
           <h1 id="profile-name">{profile.name || 'Your name'}</h1>
           <p className="profile-role">{[profile.role, profile.organization].filter(Boolean).join(' · ')}</p>
           <p className="hero-summary">Turning ideas into useful software and working products.</p>
           <div className="hero-actions">
             <button className="button button-primary" onClick={saveContact} type="button"><span aria-hidden="true">＋</span> Save Contact</button>
             <button className="button button-secondary" onClick={shareProfile} type="button"><span aria-hidden="true">↗</span> Share Profile</button>
-            {phones[0] && <a className="button button-tertiary" href={`tel:${phones[0]}`}><span aria-hidden="true">☎</span> Call</a>}
+            {phones[0] && <a className="button button-tertiary" href={`tel:${phones[0].replace(/[^\d+]/g, '')}`}><span aria-hidden="true">☎</span> Call</a>}
           </div>
         </section>
 
         <div className="profile-content">
           <section className="content-section about-section" aria-labelledby="about-heading">
             <h2 id="about-heading">About me</h2>
-            <p>An emerging technology professional passionate about creating useful software, building systems, apps, and websites, and turning ideas into working products.</p>
+            <p>{profile.about || profile.bio}</p>
           </section>
 
           <section className="content-section" aria-labelledby="skills-heading">
@@ -157,7 +165,7 @@ export function ProfilePage() {
                   return (
                     <ProjectTag className="project-item" role="listitem" key={item.name} {...(item.url ? { href: item.url, target: '_blank', rel: 'noreferrer', 'aria-label': `Visit ${item.name} website` } : {})}>
                       {item.image ? <img className="project-image" src={item.image} alt="" loading="lazy" /> : <span className="project-image project-image-fallback" aria-hidden="true">{item.name.split(/\s+/).map((word) => word[0]).slice(0, 2).join('')}</span>}
-                      <span className="project-text"><span className={`project-status ${item.url ? 'project-status-live' : ''}`}>{item.status}</span><strong>{item.name}</strong>{item.description && <small>{item.description}</small>}</span>
+                      <span className="project-text"><span className={`project-status ${item.url ? 'project-status-live' : ''}`}>{item.status}</span><strong>{item.name}</strong>{item.description && <small>{item.description}</small>}{item.contribution && <small className="project-contribution">{item.contribution}</small>}</span>
                       {item.url && <span className="project-arrow" aria-hidden="true">↗</span>}
                     </ProjectTag>
                   );
@@ -176,7 +184,7 @@ export function ProfilePage() {
                 </a>
               ))}
               {profile.email && <a href={`mailto:${profile.email}`} aria-label="Email" title="Email"><span className="social-mark" aria-hidden="true">@</span><small>Email</small></a>}
-              {phones[0] && <a href={`tel:${phones[0]}`} aria-label={`Call ${phones[0]}`} title="Call"><span className="social-mark" aria-hidden="true">☎</span><small>Call</small></a>}
+              {phones[0] && <a href={`tel:${phones[0].replace(/[^\d+]/g, '')}`} aria-label={`Call ${phones[0]}`} title="Call"><span className="social-mark" aria-hidden="true">☎</span><small>Call</small></a>}
               {whatsappUrl && <a href={whatsappUrl} target="_blank" rel="noreferrer" aria-label="WhatsApp" title="WhatsApp"><span className="social-mark social-mark-whatsapp" aria-hidden="true">WA</span><small>WhatsApp</small></a>}
             </nav>
             <div className="direct-contact" aria-label="Copy contact details">
