@@ -118,7 +118,7 @@ export function ProfilePage({ profileData = profile }) {
       <article className="profile-page">
         <section className="hero-card" aria-labelledby="profile-name">
           <header className="hero-brand-row">
-            <a className="profile-brand" href="/profile" aria-label="Vexa profile">
+            <a className="profile-brand" href={profile.publicPath || '/profile'} aria-label={`${profile.name}’s Vexa profile`}>
               <span className="profile-brand-mark" aria-hidden="true">ϟ</span>
               <span><strong>VEXA</strong><small>DIGITAL IDENTITY</small></span>
             </a>
